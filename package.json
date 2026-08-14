@@ -1,0 +1,29 @@
+{
+  "name": "prime-salon-backend",
+  "version": "1.0.0",
+  "description": "Prime Salon — Monolith Backend (3 files: server + firebaseEngine + whatsappBot)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.4.0",
+    "firebase-admin": "^12.3.0",
+    "twilio": "^5.3.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5"
+  },
+  "keywords": ["salon", "booking", "whatsapp", "firebase"],
+  "license": "UNLICENSED",
+  "private": true
+}
