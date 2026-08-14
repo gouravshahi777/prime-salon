@@ -1,1 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Prime Salon — Premium Grooming</title>
+<meta name="description" content="Prime Salon — Premium grooming, luxury facials & spa in Model Town, Ludhiana">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#FAFAF8;--bg-alt:#F3F1ED;--white:#FFF;--gold:#B8860B;--gold-light:#D4A847;--gold-pale:#FDF6E3;--gold-grad:linear-gradient(135deg,#B8860B,#D4A847);--text:#1A1A2E;--body:#4A4A5A;--muted:#9CA3AF;--border:#E8E5DE;--border-lt:#F0EDE5;--shd:0 4px 20px rgba(0,0,0,0.06);--shd-gold:0 4px 20px rgba(184,134,11,0.2);--r:16px;--rs:10px;--rf:100px;--green:#22C55E;--red:#EF4444;--orange:#F59E0B;--blue:#3B82F6;--fd:'Playfair Display',Georgia,serif;--fb:'Inter',-apple-system,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--fb);background:var(--bg);color:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}input,select,textarea,button{font-family:var(--fb)}a{text-decoration:none;color:inherit}
+.fd{font-family:var(--fd)}.tc{text-align:center}.hid{display:none!important}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;text-transform:uppercase}
+.bg{background:#ECFDF5;color:var(--green)}.bo{background:#FFF7ED;color:var(--orange)}.bb{background:#EFF6FF;color:var(--blue)}.br{background:#FEF2F2;color:var(--red)}.bm{background:#F3F4F6;color:var(--muted)}.bgd{background:var(--gold-pale);color:var(--gold)}
+.card{background:var(--white);border:1px solid var(--border-lt);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .3s}.card:hover{box-shadow:var(--shd)}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}.section{padding:72px 20px}.section-alt{background:var(--bg-alt)}
+.sb{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}.sb::before,.sb::after{content:'';width:24px;height:1px;background:var(--gold);opacity:.4}
+.st{font-family:var(--fd);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;color:var(--text);line-height:1.2;margin:8px 0 12px}
+.gd{width:48px;height:2px;background:var(--gold-grad);border-radius:2px;margin:12px auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;border:none;border-radius:var(--rf);background:var(--gold-grad);color:#fff;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:var(--shd-gold)}.btn:hover{transform:translateY(-2px)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border:1.5px solid var(--border);border-radius:var(--rf);background:var(--white);color:var(--text);font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .3s}.btn2:hover{border-color:var(--gold);color:var(--gold)}
+.bsm{padding:8px 18px;font-size:.7rem}
+.inp{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.85rem;color:var(--text);background:var(--white);outline:none;transition:border .3s}.inp:focus{border-color:var(--gold)}.inp::placeholder{color:var(--muted)}
+.sel{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.85rem;color:var(--text);background:var(--white);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23B8860B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}.sel:focus{border-color:var(--gold)}
+.lbl{display:block;font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+/* Nav */
+.tn{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-lt);padding:0 24px;height:60px;display:none;align-items:center;justify-content:space-between}@media(min-width:768px){.tn{display:flex}}
+.tn .lo{display:flex;align-items:center;gap:10px;cursor:pointer}.tn .li{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--gold-pale);border:1.5px solid rgba(184,134,11,.2)}.tn .lt{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text)}.tn .lt span{color:var(--gold)}
+.tn nav{display:flex;align-items:center;gap:4px}.nb{padding:8px 18px;border:none;background:none;border-radius:var(--rf);font-size:.78rem;font-weight:500;color:var(--body);cursor:pointer;transition:all .25s}.nb:hover,.nb.ac{color:var(--gold);background:var(--gold-pale)}
+.bn{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border-lt);padding:6px 0 max(6px,env(safe-area-inset-bottom));display:flex;justify-content:space-around;align-items:center}@media(min-width:768px){.bn{display:none}}
+.bn button{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;padding:6px 12px;cursor:pointer;color:var(--muted);transition:color .25s;border-radius:12px}.bn button.ac{color:var(--gold)}.bn .ni{font-size:1.15rem}.bn .nl{font-size:.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}.bn .ad{width:4px;height:2px;border-radius:2px;background:var(--gold);margin-top:1px;opacity:0;transition:all .25s}.bn button.ac .ad{opacity:1;width:14px}
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 20px 40px;background:linear-gradient(160deg,#FFFDF7 0%,var(--bg) 50%,#F5F0E8 100%);position:relative;overflow:hidden}.hero::before{content:'';position:absolute;top:-50%;right:-30%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(184,134,11,.05) 0%,transparent 70%)}.hero-c{position:relative;z-index:1;max-width:600px}
+.hb{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:var(--rf);background:var(--gold-pale);border:1px solid rgba(184,134,11,.15);font-size:.65rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.hero h1{font-family:var(--fd);font-size:clamp(2.5rem,7vw,4rem);font-weight:800;color:var(--text);line-height:1.1;margin-bottom:16px}.hero h1 span{color:var(--gold)}.hero p{font-size:1rem;color:var(--body);margin-bottom:32px;max-width:420px;margin-left:auto;margin-right:auto}
+/* Service cards */
+.sl{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.sc{padding:18px;display:flex;gap:14px;align-items:flex-start}.si{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--gold-pale);flex-shrink:0}.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}.sn{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text)}.sp{font-size:1rem;font-weight:700;color:var(--gold);white-space:nowrap}.sd{font-size:.78rem;color:var(--muted);margin-bottom:8px}.sf{display:flex;justify-content:space-between;align-items:center}
+.sbb{padding:6px 16px;border:1.5px solid var(--gold);border-radius:var(--rf);background:none;color:var(--gold);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;transition:all .3s}.sbb:hover{background:var(--gold);color:#fff}
+/* Category tabs */
+.ct{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}.ctb{padding:10px 24px;border:1.5px solid var(--border);border-radius:var(--rf);font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;background:var(--white);color:var(--body);transition:all .3s}.ctb.ac{background:var(--gold-grad);color:#fff;border-color:transparent;box-shadow:var(--shd-gold)}
+/* Calendar */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.ch{text-align:center;font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--muted);padding:8px 0}
+.cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:.82rem;font-weight:500;color:var(--body);cursor:pointer;transition:all .25s;border:1px solid transparent}.cd:hover:not(.dis):not(.sel){background:var(--gold-pale);border-color:rgba(184,134,11,.2)}.cd.tod{border-color:var(--gold);color:var(--gold);font-weight:600}.cd.sel{background:var(--gold-grad)!important;color:#fff!important;font-weight:700;box-shadow:var(--shd-gold)}.cd.dis{opacity:.2;cursor:default;pointer-events:none}
+/* Time chips */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tc2{padding:10px;border-radius:var(--rs);text-align:center;font-size:.78rem;font-weight:500;border:1px solid var(--border);background:var(--white);color:var(--body);cursor:pointer;transition:all .25s}.tc2:hover{border-color:var(--gold);color:var(--gold)}.tc2.ac{background:var(--gold-grad);color:#fff;border-color:transparent;font-weight:700;box-shadow:var(--shd-gold)}.tc2.lk{opacity:.25;cursor:not-allowed;pointer-events:none;text-decoration:line-through}
+/* Stylist option */
+.so{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r);border:1.5px solid var(--border-lt);background:var(--white);cursor:pointer;transition:all .3s;width:100%}.so:hover{border-color:var(--border)}.so.ac{border-color:var(--gold);background:var(--gold-pale)}.so .av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;background:var(--gold-pale);color:var(--gold);transition:all .3s}.so.ac .av{background:var(--gold-grad);color:#fff}
+/* Booking summary */
+.bs{background:var(--gold-pale);border-radius:var(--r);padding:16px;border:1px solid rgba(184,134,11,.1);margin-bottom:16px}.bs .rw{display:flex;justify-content:space-between;padding:4px 0}.bs .rl{font-size:.72rem;color:var(--muted)}.bs .rv{font-size:.82rem;font-weight:600;color:var(--text)}
+/* Progress */
+.pb{display:flex;gap:4px;margin-bottom:28px}.ps{flex:1;text-align:center}.ps .br2{height:3px;border-radius:3px;background:var(--border-lt);margin-bottom:6px;transition:background .5s}.ps .br2.dn{background:var(--gold)}.ps .br2.cur{background:linear-gradient(90deg,var(--gold),var(--border-lt))}.ps .pl{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);transition:color .3s}.ps .pl.ac{color:var(--gold)}
+/* Stats */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}@media(min-width:768px){.sg{grid-template-columns:repeat(4,1fr)}}
+/* Admin */
+.at{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}.atb{padding:8px 16px;border-radius:var(--rf);border:1px solid var(--border);background:var(--white);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;color:var(--muted);transition:all .25s}.atb.ac{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
+.al{display:flex;flex-direction:column;gap:8px}.ar{display:flex;align-items:center;gap:12px;padding:14px;flex-wrap:wrap}
+/* Pin */
+.pds{display:flex;gap:10px;justify-content:center;margin:24px 0}.pd{width:14px;height:14px;border-radius:50%;background:var(--border);transition:all .3s}.pd.fl{background:var(--gold);box-shadow:0 0 10px rgba(184,134,11,.3);transform:scale(1.15)}
+.np{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto}.np button{height:52px;border-radius:14px;border:1px solid var(--border);background:var(--white);font-size:1.1rem;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s}.np button:active{background:var(--gold-pale);transform:scale(.95)}
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}.ml{background:var(--white);border-radius:var(--r);padding:24px;max-width:460px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shd)}
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:300;padding:12px 24px;border-radius:var(--r);background:var(--text);color:#fff;font-size:.82rem;font-weight:600;box-shadow:0 8px 40px rgba(0,0,0,.15);animation:su .3s ease}@keyframes su{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* WA FAB */
+.wf{position:fixed;z-index:90;bottom:76px;right:16px;width:52px;height:52px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .3s}@media(min-width:768px){.wf{bottom:24px;right:24px}}.wf:hover{transform:scale(1.08)}.wf svg{fill:#fff;width:26px;height:26px}
+.page{animation:fi .35s ease}@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.footer{padding:48px 20px;background:var(--white);border-top:1px solid var(--border-lt);margin-bottom:60px}@media(min-width:768px){.footer{margin-bottom:0}}
+.sfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.db{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);font-size:.6rem;font-weight:700;cursor:pointer;transition:all .25s;background:var(--white);color:var(--muted)}.db.ac{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+
+<header class="tn" id="topNav"><div class="lo" onclick="nav('home')"><div class="li">👑</div><div class="lt">Prime <span>Salon</span></div></div><nav id="tnb"></nav></header>
+<main id="app"></main>
+<nav class="bn" id="bnav"></nav>
+<a class="wf" id="waFab" href="https://wa.me/911234567890" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+<div id="toast" class="toast hid"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   §A  FIREBASE — prime-salon-36548 (LIVE CONFIG)
+   ══════════════════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyDGNZqSS8IhFbtvwaCCzBAXaEwTsEkwMrk",authDomain:"prime-salon-36548.firebaseapp.com",
+  databaseURL:"https://prime-salon-36548-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"prime-salon-36548",storageBucket:"prime-salon-36548.firebasestorage.app",
+  messagingSenderId:"23925350245",appId:"1:23925350245:web:c5400069514dcc7856cb8c"
+});
+const DB=firebase.database();
+
+/* ══════════════════════════════════════════════════════
+   §B  DATA
+   ══════════════════════════════════════════════════════ */
+const PIN="9400",LK_T=5*60*1000,PH="911234567890";
+const SVCS={Hair:[
+  {id:"svc_001",n:"Royal Haircut & Styling",d:"Precision cuts with hot towel, shampoo & style.",p:499,t:"45 min",i:"✂️"},
+  {id:"svc_002",n:"Beard Sculpting",d:"Straight-razor shaves with premium balm.",p:299,t:"30 min",i:"🧔"},
+  {id:"svc_003",n:"Hair Coloring & Highlights",d:"Balayage to bold. Ammonia-free premium brands.",p:1499,t:"90 min",i:"🎨"},
+  {id:"svc_004",n:"Kids Haircut",d:"Gentle, fun haircuts for little ones.",p:199,t:"20 min",i:"👦"},
+],Skin:[
+  {id:"svc_005",n:"Luxury Facial",d:"Deep-cleansing facials for your skin type.",p:799,t:"60 min",i:"✨"},
+  {id:"svc_006",n:"Anti-Tan Treatment",d:"De-tan therapy for your natural glow.",p:599,t:"45 min",i:"☀️"},
+  {id:"svc_007",n:"Gold Facial",d:"24K gold-infused facial for radiance.",p:1299,t:"75 min",i:"👑"},
+],Spa:[
+  {id:"svc_008",n:"Head & Body Massage",d:"Aromatherapy head massage & body relaxation.",p:599,t:"45 min",i:"💆"},
+  {id:"svc_009",n:"Bridal & Groom Package",d:"Complete grooming for your big day.",p:4999,t:"3 hrs",i:"💍"},
+  {id:"svc_010",n:"Royal Spa Combo",d:"Massage + facial + hair spa combo.",p:2499,t:"2 hrs",i:"🧖"},
+]};
+const ASVC=Object.values(SVCS).flat();
+const STYL=[
+  {id:"stl_001",n:"Rahul Verma",r:"Master Stylist",e:"12 yrs",ini:"RV"},
+  {id:"stl_002",n:"Priya Sharma",r:"Colour Specialist",e:"8 yrs",ini:"PS"},
+  {id:"stl_003",n:"Arjun Singh",r:"Skin & Spa Expert",e:"10 yrs",ini:"AS"},
+  {id:"stl_004",n:"Neha Kapoor",r:"Bridal Stylist",e:"9 yrs",ini:"NK"},
+];
+const TEST=[
+  {t:"Prime Salon is on another level. Attention to detail, ambiance — everything five-star.",a:"Amit Khanna",r:"Business Owner",ini:"AK"},
+  {t:"My wedding look was absolutely perfect. Neha understood exactly what I wanted.",a:"Simran Mehta",r:"Bride, Chandigarh",ini:"SM"},
+  {t:"The facial here is worth every rupee. My skin hasn't felt this fresh in years.",a:"Rajiv Gupta",r:"IT Professional",ini:"RG"},
+];
+const TS=["10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM","06:30 PM","07:00 PM","07:30 PM","08:00 PM","08:30 PM"];
+const MO=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SM={confirmed:"bg",pending:"bo",completed:"bb",cancelled:"br","no-show":"bm"};
+const NV=[{id:"home",l:"Home",ic:"🏠"},{id:"services",l:"Menu",ic:"💇"},{id:"booking",l:"Book",ic:"📅"},{id:"admin",l:"Admin",ic:"⚙️"}];
+
+/* ══════════════════════════════════════════════════════
+   §C  STATE
+   ══════════════════════════════════════════════════════ */
+const S={pg:"home",bCat:"Hair",bSvc:"",bDt:null,bTm:null,bSt:null,bStp:1,bNm:"",bPh:"",cM:new Date().getMonth(),cY:new Date().getFullYear(),lk:{},sid:`s_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,aA:false,aP:"",aT:"dashboard",aD:tdy(),aApt:{},aMo:false,tI:0};
+function tdy(){return new Date().toISOString().split("T")[0]}
+function gid(p){return`${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`}
+
+/* ══════════════════════════════════════════════════════
+   §D  NAV & RENDER
+   ══════════════════════════════════════════════════════ */
+function nav(p,o){if(o)Object.assign(S,o);S.pg=p;window.scrollTo({top:0,behavior:"instant"});R()}
+function R(){const a=document.getElementById("app");switch(S.pg){case"home":a.innerHTML=rHome();break;case"services":a.innerHTML=rSvc();break;case"booking":a.innerHTML=rBook();break;case"admin":a.innerHTML=rAdmin();break}rNav()}
+function rNav(){
+  document.getElementById("tnb").innerHTML=NV.map(n=>`<button class="nb ${S.pg===n.id?'ac':''}" onclick="nav('${n.id}')">${n.l}</button>`).join("")+`<button class="btn bsm" style="margin-left:8px" onclick="nav('booking')">Book Now</button>`;
+  document.getElementById("bnav").innerHTML=NV.map(n=>`<button class="${S.pg===n.id?'ac':''}" onclick="nav('${n.id}')"><span class="ni">${n.ic}</span><span class="nl">${n.l}</span><span class="ad"></span></button>`).join("");
+}
+function toast(m){const t=document.getElementById("toast");t.textContent="✓ "+m;t.classList.remove("hid");setTimeout(()=>t.classList.add("hid"),2200)}
+
+/* ══════════════════════════════════════════════════════
+   §E  HOME
+   ══════════════════════════════════════════════════════ */
+function rHome(){const t=TEST[S.tI];return`<div class="page">
+<section class="hero"><div class="hero-c"><div class="hb">✦ Premium Grooming ✦</div><h1>Prime <span>Salon</span></h1><p>Where craftsmanship meets luxury. Precision grooming, artful styling & rejuvenating spa rituals.</p><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center"><button class="btn" onclick="nav('booking')">Book Appointment</button><button class="btn2" onclick="nav('services')">View Menu</button></div></div></section>
+<section class="section section-alt"><div class="container tc"><div class="sb">Why Choose Us</div><h2 class="st">The Prime Difference</h2><div class="gd"></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:32px"><div class="card" style="padding:28px;text-align:center"><div style="font-size:2rem;margin-bottom:12px">🏆</div><h3 class="fd" style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:6px">15,000+ Happy Clients</h3><p style="font-size:.82rem;color:var(--muted)">A decade of trust, precision & premium grooming.</p></div><div class="card" style="padding:28px;text-align:center"><div style="font-size:2rem;margin-bottom:12px">⭐</div><h3 class="fd" style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:6px">25+ Expert Stylists</h3><p style="font-size:.82rem;color:var(--muted)">Each artist brings mastery and a personal touch.</p></div><div class="card" style="padding:28px;text-align:center"><div style="font-size:2rem;margin-bottom:12px">💎</div><h3 class="fd" style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:6px">40+ Premium Services</h3><p style="font-size:.82rem;color:var(--muted)">From cuts to complete bridal packages.</p></div></div></div></section>
+<section class="section"><div class="container tc"><div class="sb">Client Love</div><h2 class="st">What They Say</h2><div class="gd"></div><div class="card" style="padding:32px;text-align:center;max-width:560px;margin:32px auto 0"><div class="fd" style="font-size:3rem;color:var(--gold);opacity:.3;line-height:1">"</div><p style="font-size:.95rem;font-style:italic;color:var(--text);margin:12px 0 20px;line-height:1.7">${t.t}</p><div style="display:flex;align-items:center;gap:10px;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;background:var(--gold-grad);color:#fff">${t.ini}</div><div style="text-align:left"><div style="font-size:.82rem;font-weight:600;color:var(--text)">${t.a}</div><div style="font-size:.7rem;color:var(--muted)">${t.r}</div></div></div></div><div style="display:flex;gap:6px;justify-content:center;margin-top:20px">${TEST.map((_,i)=>`<button style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:${i===S.tI?'var(--gold)':'var(--border)'};transition:all .3s;${i===S.tI?'transform:scale(1.3)':''}" onclick="S.tI=${i};R()"></button>`).join("")}</div></div></section>
+<section class="section section-alt tc"><div class="container" style="max-width:480px"><h2 class="st">Ready for a Royal Look?</h2><p style="margin-bottom:24px">Book your appointment today.</p><button class="btn" onclick="nav('booking')">Book Now →</button></div></section>
+${rFoot()}</div>`}
+
+/* ══════════════════════════════════════════════════════
+   §F  SERVICES
+   ══════════════════════════════════════════════════════ */
+function rSvc(){const cs=Object.keys(SVCS),it=SVCS[S.bCat]||[];return`<div class="page"><section class="section" style="padding-top:80px;padding-bottom:100px"><div class="container tc"><div class="sb">Our Menu</div><h2 class="st">Premium Services</h2><div class="gd"></div><p style="color:var(--muted);font-size:.85rem;margin-bottom:24px">From precision cuts to rejuvenating spa rituals.</p><div class="ct">${cs.map(c=>`<button class="ctb ${S.bCat===c?'ac':''}" onclick="S.bCat='${c}';R()">${c}</button>`).join("")}</div><div class="sl">${it.map(s=>`<div class="card sc"><div class="si">${s.i}</div><div style="flex:1;min-width:0"><div class="sh"><div class="sn">${s.n}</div><div class="sp">₹${s.p.toLocaleString()}</div></div><div class="sd">${s.d}</div><div class="sf"><span style="font-size:.72rem;color:var(--muted)">🕐 ${s.t}</span><button class="sbb" onclick="nav('booking',{bSvc:'${s.n}',bStp:1})">Book →</button></div></div></div>`).join("")}</div></div></section>${rFoot()}</div>`}
+
+/* ══════════════════════════════════════════════════════
+   §G  BOOKING
+   ══════════════════════════════════════════════════════ */
+function rBook(){const s=S,sl=["Date","Time","Stylist","Details"];let c="";
+if(s.bStp===5){c=`<div class="card tc" style="padding:40px 20px"><div style="width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:#ECFDF5;border:2px solid #BBF7D0;color:var(--green)">✓</div><h3 class="fd" style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:8px">Booking Confirmed!</h3><p style="font-size:.85rem;color:var(--muted);margin-bottom:20px">We'll confirm via WhatsApp shortly.</p><button class="btn2" onclick="rsBk()">Book Another</button></div>`}
+else if(s.bStp===1){const td=new Date(),ds=new Date(s.cY,s.cM+1,0).getDate(),f=new Date(s.cY,s.cM,1).getDay();let g=["Su","Mo","Tu","We","Th","Fr","Sa"].map(d=>`<div class="ch">${d}</div>`).join("");for(let i=0;i<f;i++)g+=`<div></div>`;for(let d=1;d<=ds;d++){const dt=new Date(s.cY,s.cM,d),ps=dt<new Date(td.getFullYear(),td.getMonth(),td.getDate()),it=d===td.getDate()&&s.cM===td.getMonth()&&s.cY===td.getFullYear(),sl2=s.bDt===d;g+=`<div class="cd ${ps?'dis':''} ${it&&!sl2?'tod':''} ${sl2?'sel':''}" onclick="${ps?'':`S.bDt=${d};R()`}">${d}</div>`}
+c=`<div class="card" style="padding:20px"><h3 class="fd" style="font-weight:700;color:var(--text);margin-bottom:14px">Select a Date</h3><div style="margin-bottom:14px"><div class="lbl">Service</div><select class="sel" onchange="S.bSvc=this.value">${`<option value="">Choose a service…</option>`+ASVC.map(sv=>`<option value="${sv.n}" ${s.bSvc===sv.n?'selected':''}>${sv.n} — ₹${sv.p}</option>`).join("")}</select></div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><button class="btn2 bsm" onclick="pM()">‹</button><h4 class="fd" style="font-size:1rem;font-weight:600;color:var(--text)">${MO[s.cM]} ${s.cY}</h4><button class="btn2 bsm" onclick="nM()">›</button></div><div class="cg">${g}</div><button class="btn" style="width:100%;margin-top:16px" ${!s.bDt||!s.bSvc?'disabled':''} onclick="sSW();S.bStp=2;R()">Continue →</button></div>`}
+else if(s.bStp===2){const ds=gDS();c=`<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><button class="btn2 bsm" onclick="S.bStp=1;R()">← Back</button><h3 class="fd" style="font-weight:700;color:var(--text)">Pick a Time</h3></div><p style="font-size:.75rem;color:var(--muted);margin-bottom:14px">${s.bDt} ${MO[s.cM]} ${s.cY} • ${s.bSvc}</p><div class="tg">${TS.map(t=>{const lk=iSL(ds,t);return`<div class="tc2 ${s.bTm===t?'ac':''} ${lk?'lk':''}" onclick="${lk?'':`S.bTm='${t}';R()`}">${t}</div>`}).join("")}</div><button class="btn" style="width:100%;margin-top:16px" ${!s.bTm?'disabled':''} onclick="S.bStp=3;R()">Continue →</button></div>`}
+else if(s.bStp===3){c=`<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><button class="btn2 bsm" onclick="S.bStp=2;R()">← Back</button><h3 class="fd" style="font-weight:700;color:var(--text)">Choose Stylist</h3></div><div style="display:flex;flex-direction:column;gap:8px">${STYL.map(st=>`<button class="so ${s.bSt===st.n?'ac':''}" onclick="S.bSt='${st.n}';R()"><div class="av">${st.ini}</div><div style="flex:1;text-align:left"><div style="font-size:.85rem;font-weight:600;color:var(--text)">${st.n}</div><div style="font-size:.72rem;color:var(--muted)">${st.r} • ${st.e}</div></div>${s.bSt===st.n?'<span style="color:var(--gold);font-weight:700">✓</span>':''}</button>`).join("")}<button class="so ${s.bSt==='Any'?'ac':''}" onclick="S.bSt='Any';R()"><div class="av" style="font-size:.7rem">Any</div><div style="font-size:.82rem;color:var(--muted)">No preference</div></button></div><button class="btn" style="width:100%;margin-top:16px" ${!s.bSt?'disabled':''} onclick="S.bStp=4;R()">Continue →</button></div>`}
+else if(s.bStp===4){c=`<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><button class="btn2 bsm" onclick="S.bStp=3;R()">← Back</button><h3 class="fd" style="font-weight:700;color:var(--text)">Your Details</h3></div><div class="bs"><div class="rw"><span class="rl">Service</span><span class="rv">${s.bSvc}</span></div><div class="rw"><span class="rl">Date</span><span class="rv">${s.bDt} ${MO[s.cM]}</span></div><div class="rw"><span class="rl">Time</span><span class="rv">${s.bTm}</span></div><div class="rw"><span class="rl">Stylist</span><span class="rv">${s.bSt}</span></div></div><div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"><div><div class="lbl">Full Name</div><input class="inp" placeholder="Your name" value="${s.bNm}" oninput="S.bNm=this.value"></div><div><div class="lbl">Phone Number</div><input class="inp" type="tel" placeholder="+91 XXXXX XXXXX" value="${s.bPh}" oninput="S.bPh=this.value"></div></div><button class="btn" style="width:100%" ${!s.bNm.trim()||!s.bPh.trim()?'disabled':''} onclick="cBk()">✓ Confirm Booking</button></div>`}
+return`<div class="page"><section class="section" style="padding-top:80px;padding-bottom:100px"><div class="container tc"><div class="sb">Book Now</div><h2 class="st">Your Royal Look Awaits</h2><div class="gd"></div></div><div style="max-width:480px;margin:24px auto 0;padding:0 20px">${s.bStp<5?`<div class="pb">${sl.map((l,i)=>`<div class="ps"><div class="br2 ${s.bStp>i+1?'dn':''} ${s.bStp===i+1?'cur':''}"></div><div class="pl ${s.bStp>=i+1?'ac':''}">${l}</div></div>`).join("")}</div>`:""} ${c}</div></section></div>`}
+function pM(){if(S.cM===0){S.cM=11;S.cY--}else S.cM--;R()}
+function nM(){if(S.cM===11){S.cM=0;S.cY++}else S.cM++;R()}
+function rsBk(){Object.assign(S,{bStp:1,bDt:null,bTm:null,bSt:null,bSvc:"",bNm:"",bPh:""});R()}
+
+/* ══════════════════════════════════════════════════════
+   §H  FIREBASE SLOT LOCKING
+   ══════════════════════════════════════════════════════ */
+let swU=null;
+function gDS(){return`${S.cY}-${String(S.cM+1).padStart(2,'0')}-${String(S.bDt).padStart(2,'0')}`}
+function sSW(){if(swU)swU();const ds=gDS(),ref=DB.ref(`slot_locks/${ds}`),cb=ref.on("value",sn=>{S.lk=sn.val()||{};if(S.pg==="booking"&&S.bStp===2)R()});swU=()=>ref.off("value",cb)}
+function iSL(ds,ts){const sl=S.lk[ts];if(!sl)return false;return Object.values(sl).some(l=>l.locked&&(l.confirmed||Date.now()-l.locked_at<LK_T))}
+async function lkS(ds,ts,si){const ref=DB.ref(`slot_locks/${ds}/${ts}/${si}`);try{const r=await ref.transaction(c=>{if(!c||!c.locked)return{locked:true,locked_by:S.sid,locked_at:Date.now(),confirmed:false};if(c.locked&&!c.confirmed&&Date.now()-c.locked_at>LK_T)return{locked:true,locked_by:S.sid,locked_at:Date.now(),confirmed:false};return});return r.committed}catch(e){return false}}
+async function cBk(){const s=S,ds=gDS(),st=STYL.find(x=>x.n===s.bSt)||{id:"stl_001",n:s.bSt},sv=ASVC.find(x=>x.n===s.bSvc)||{id:"svc_x",p:0,t:"30 min"};
+const lk=await lkS(ds,s.bTm,st.id||"stl_001");if(!lk){alert("Sorry, slot just booked! Pick another.");return}
+const aid=gid("apt");await DB.ref(`appointments/${aid}`).set({customer_name:s.bNm,customer_phone:s.bPh,service_id:sv.id,service_name:s.bSvc,stylist_id:st.id||"stl_001",stylist_name:st.n,date:ds,time_slot:s.bTm,duration_minutes:parseInt(sv.t)||30,price:sv.p||0,status:"confirmed",source:"online",notes:"",created_at:Date.now(),updated_at:Date.now()});
+await DB.ref(`slot_locks/${ds}/${s.bTm}/${st.id||"stl_001"}`).set({locked:true,locked_by:aid,locked_at:Date.now(),confirmed:true});
+const wm=`Hello Prime Salon! 🌟\n\nBooking:\n👤 ${s.bNm}\n📞 ${s.bPh}\n💇 ${s.bSvc}\n🧑‍🎨 ${st.n}\n📅 ${ds}\n🕐 ${s.bTm}`;
+window.open(`https://wa.me/${PH}?text=${encodeURIComponent(wm)}`,"_blank");S.bStp=5;R()}
+
+/* ══════════════════════════════════════════════════════
+   §I  ADMIN
+   ══════════════════════════════════════════════════════ */
+function rAdmin(){if(!S.aA)return rPin();return`<div class="page"><section class="section" style="padding-top:80px;padding-bottom:100px"><div class="container"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px"><div><h2 class="fd" style="font-size:1.4rem;font-weight:700;color:var(--text)">👑 Admin Dashboard</h2><p style="font-size:.75rem;color:var(--muted)">Prime Salon — Facility Management</p></div><div style="display:flex;gap:8px;align-items:center"><input type="date" class="inp" style="width:auto" value="${S.aD}" onchange="S.aD=this.value;lAD()"><button class="btn bsm" onclick="S.aMo=true;R()">+ Walk-In</button></div></div><div class="at">${["dashboard","services","staff"].map(t=>`<button class="atb ${S.aT===t?'ac':''}" onclick="S.aT='${t}';R()">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div><div id="ac">${rAT()}</div></div></section>${S.aMo?rWM():""}</div>`}
+function rPin(){return`<div class="page"><section class="section"><div style="min-height:70vh;display:flex;align-items:center;justify-content:center"><div class="tc"><div style="font-size:2.5rem;margin-bottom:12px">🔒</div><h2 class="fd" style="font-size:1.5rem;font-weight:700;color:var(--text)">Admin Access</h2><p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">Enter 4-digit PIN</p><div class="pds">${[0,1,2,3].map(i=>`<div class="pd ${i<S.aP.length?'fl':''}"></div>`).join("")}</div><div class="np">${[1,2,3,4,5,6,7,8,9,null,0,"⌫"].map(d=>d!==null?`<button onclick="${typeof d==='number'?`aP('${d}')`:'rP()'}">${d}</button>`:`<div></div>`).join("")}</div></div></div></section></div>`}
+function aP(d){if(S.aP.length>=4)return;S.aP+=d;if(S.aP.length===4)setTimeout(()=>{if(S.aP===PIN){S.aA=true;lAD()}else{S.aP="";toast("Wrong PIN")}R()},200);R()}
+function rP(){S.aP=S.aP.slice(0,-1);R()}
+function lAD(){DB.ref("appointments").orderByChild("date").equalTo(S.aD).on("value",sn=>{S.aApt=sn.val()||{};if(S.pg==="admin"&&S.aA){const el=document.getElementById("ac");if(el)el.innerHTML=rAT()}})}
+function rAT(){const ap=Object.entries(S.aApt).sort((a,b)=>TS.indexOf(a[1].time_slot)-TS.indexOf(b[1].time_slot));
+if(S.aT==="dashboard"){const tt=ap.length,cf=ap.filter(([,a])=>a.status==="confirmed").length,cp=ap.filter(([,a])=>a.status==="completed").length,rv=ap.filter(([,a])=>["confirmed","completed"].includes(a.status)).reduce((s,[,a])=>s+a.price,0);
+return`<div class="sg"><div class="card" style="padding:18px"><div style="font-size:1.2rem;margin-bottom:8px">📋</div><div style="font-size:1.4rem;font-weight:700;color:var(--text)">${tt}</div><div style="font-size:.68rem;color:var(--muted)">Total Bookings</div></div><div class="card" style="padding:18px"><div style="font-size:1.2rem;margin-bottom:8px">💰</div><div style="font-size:1.4rem;font-weight:700;color:var(--text)">₹${rv.toLocaleString()}</div><div style="font-size:.68rem;color:var(--muted)">Revenue</div></div><div class="card" style="padding:18px"><div style="font-size:1.2rem;margin-bottom:8px">✅</div><div style="font-size:1.4rem;font-weight:700;color:var(--text)">${cf}</div><div style="font-size:.68rem;color:var(--muted)">Confirmed</div></div><div class="card" style="padding:18px"><div style="font-size:1.2rem;margin-bottom:8px">🏁</div><div style="font-size:1.4rem;font-weight:700;color:var(--text)">${cp}</div><div style="font-size:.68rem;color:var(--muted)">Completed</div></div></div>
+<div class="al">${ap.length===0?`<div class="card tc" style="padding:32px;color:var(--muted)">No appointments</div>`:ap.map(([id,a])=>`<div class="card ar"><div style="font-size:.82rem;font-weight:700;color:var(--text);min-width:72px">${a.time_slot}</div><div style="flex:1;min-width:150px"><div style="font-size:.82rem;font-weight:600;color:var(--text)">${a.customer_name}</div><div style="font-size:.7rem;color:var(--muted)">${a.service_name} • ${a.stylist_name} • ₹${a.price}</div></div><span class="badge ${SM[a.status]||'bm'}">${a.source==="walk-in"?"🚶":"🌐"} ${a.status}</span><select style="padding:5px 8px;border:1px solid var(--border);border-radius:8px;font-size:.7rem;background:var(--white);cursor:pointer;outline:none" onchange="uAS('${id}',this.value)">${["pending","confirmed","completed","cancelled","no-show"].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${s}</option>`).join("")}</select></div>`).join("")}</div>`}
+if(S.aT==="services"){return Object.keys(SVCS).map(cat=>`<h3 class="fd" style="font-weight:700;color:var(--text);margin:20px 0 10px">${cat}</h3>${SVCS[cat].map(s=>`<div class="card" style="padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px"><span style="font-size:1.3rem">${s.i}</span><div style="flex:1"><div style="font-weight:600;color:var(--text);font-size:.85rem">${s.n}</div><div style="font-size:.72rem;color:var(--muted)">₹${s.p} • ${s.t}</div></div><span class="badge bg">Active</span></div>`).join("")}`).join("")}
+if(S.aT==="staff"){return`<div class="sfg">${STYL.map(st=>`<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;background:var(--gold-grad);color:#fff">${st.ini}</div><div style="flex:1"><div style="font-weight:600;color:var(--text);font-size:.85rem">${st.n}</div><div style="font-size:.72rem;color:var(--muted)">${st.r} • ${st.e}</div></div><button style="padding:5px 12px;border-radius:20px;border:1px solid var(--green);font-size:.65rem;font-weight:700;text-transform:uppercase;cursor:pointer;background:#ECFDF5;color:var(--green)" onclick="toast('Toggled')">Available</button></div><div style="display:flex;gap:4px;margin-top:8px">${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<button class="db ${d!=='Su'?'ac':''}">${d}</button>`).join("")}</div></div>`).join("")}</div>`}
+return""}
+function uAS(id,st){DB.ref(`appointments/${id}`).update({status:st,updated_at:Date.now()});if(st==="cancelled"){const a=S.aApt[id];if(a)DB.ref(`slot_locks/${a.date}/${a.time_slot}/${a.stylist_id}`).remove()}toast("Status updated")}
+function rWM(){return`<div class="mo" onclick="S.aMo=false;R()"><div class="ml" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 class="fd" style="font-size:1.1rem;font-weight:700;color:var(--text)">Add Walk-In</h3><button style="width:32px;height:32px;border-radius:8px;border:none;background:var(--bg-alt);cursor:pointer;font-size:.9rem;color:var(--muted)" onclick="S.aMo=false;R()">✕</button></div><div style="display:flex;flex-direction:column;gap:12px"><div><div class="lbl">Name</div><input class="inp" id="wn" placeholder="Full name"></div><div><div class="lbl">Phone</div><input class="inp" id="wp" placeholder="+91 XXXXX XXXXX"></div><div><div class="lbl">Service</div><select class="sel" id="ws"><option value="">Choose…</option>${ASVC.map(s=>`<option value="${s.n}" data-p="${s.p}" data-id="${s.id}" data-t="${s.t}">${s.i} ${s.n} — ₹${s.p}</option>`).join("")}</select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div class="lbl">Stylist</div><select class="sel" id="wst"><option value="">Choose…</option>${STYL.map(s=>`<option value="${s.id}" data-n="${s.n}">${s.n}</option>`).join("")}</select></div><div><div class="lbl">Time</div><select class="sel" id="wt"><option value="">Pick…</option>${TS.map(t=>`<option value="${t}">${t}</option>`).join("")}</select></div></div><button class="btn" style="width:100%" onclick="sWI()">✓ Confirm Walk-In</button></div></div></div>`}
+async function sWI(){const nm=document.getElementById("wn").value.trim(),ph=document.getElementById("wp").value.trim(),se=document.getElementById("ws"),sv=se.value,pr=Number(se.selectedOptions[0]?.dataset?.p||0),si=se.selectedOptions[0]?.dataset?.id||"",ste=document.getElementById("wst"),sti=ste.value,stn=ste.selectedOptions[0]?.dataset?.n||"",tm=document.getElementById("wt").value;
+if(!nm||!ph||!sv||!sti||!tm){alert("Fill all fields");return}
+const lk=await lkS(S.aD,tm,sti);if(!lk){alert("Slot booked!");return}
+const aid=gid("apt");await DB.ref(`appointments/${aid}`).set({customer_name:nm,customer_phone:ph,service_id:si,service_name:sv,stylist_id:sti,stylist_name:stn,date:S.aD,time_slot:tm,duration_minutes:parseInt(document.getElementById("ws").selectedOptions[0]?.dataset?.t)||30,price:pr,status:"confirmed",source:"walk-in",notes:"",created_at:Date.now(),updated_at:Date.now()});
+await DB.ref(`slot_locks/${S.aD}/${tm}/${sti}`).set({locked:true,locked_by:aid,locked_at:Date.now(),confirmed:true});
+S.aMo=false;toast(`Walk-in: ${nm}`);R()}
+
+/* ══════════════════════════════════════════════════════
+   §J  FOOTER
+   ══════════════════════════════════════════════════════ */
+function rFoot(){return`<footer class="footer"><div class="container" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px"><div style="max-width:260px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.2rem">👑</span><span class="fd" style="font-weight:700;color:var(--text)">Prime <span style="color:var(--gold)">Salon</span></span></div><p style="font-size:.78rem;color:var(--muted)">A luxury grooming destination where craftsmanship meets care.</p></div><div><h4 style="font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Contact</h4><div style="font-size:.78rem;color:var(--muted);line-height:2">📍 Model Town, Ludhiana, Punjab<br>📞 +91 12345 67890<br>🕐 Mon–Sat: 10 AM – 9 PM</div></div></div><div style="text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border-lt);font-size:.68rem;color:var(--muted)">© 2026 Prime Salon — Powered by Prime Spot Web</div></footer>`}
+
+/* ══════════════════════════════════════════════════════
+   §K  INIT
+   ══════════════════════════════════════════════════════ */
+setInterval(()=>{if(S.pg==="home"){S.tI=(S.tI+1)%TEST.length;R()}},5000);
+R();
+</script>
+</body>
+</html>
 
