@@ -57,8 +57,21 @@ const VALID_STATUSES = ["pending", "confirmed", "completed", "cancelled", "no-sh
 
 const app = express();
 
-// Security headers (allow cross-origin for frontend + Twilio webhooks)
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+// Security headers — allow Firebase SDK, Google Fonts & inline scripts
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://*.firebaseio.com", "https://*.firebasedatabase.app", "wss://*.firebaseio.com", "wss://*.firebasedatabase.app"],
+      imgSrc: ["'self'", "data:", "https:"],
+      frameSrc: ["'self'"]
+    }
+  }
+}));
 
 // Gzip compression for all responses
 app.use(compression());
